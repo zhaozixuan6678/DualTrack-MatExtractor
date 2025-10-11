@@ -1,7 +1,7 @@
 # DualTrack-MatExtractor: A Hybrid NLP-LLM Toolbox for Automated Alloy Data Extraction
 
 ## 📖 Graphical Abstract
-<img width="1048" alt="3" src="https://github.com/zhaozixuan6678/MSE-ChatBot/assets/111862264/956752be-15fd-40db-86ac-90b06cc694b1">
+<img width="1048" alt="2" src="https://github.com/zhaozixuan6678/DualTrack-MatExtractor/issues/4#issue-3505648743">
 
 
 
@@ -25,7 +25,7 @@ https://private-user-images.githubusercontent.com/111862264/343014014-ddffdb62-0
 
 ## 🐳 Architecture of Our MSE-ChatBot
 
-<img width="1048" alt="2" src="https://github.com/zhaozixuan6678/MSE-ChatBot/assets/111862264/89eb1015-2604-42dc-af45-a93d4d48977e">
+
 
 ## 🖥️ Quickstart with Terminal 
 Detailed installation process are attached into the README.txt
