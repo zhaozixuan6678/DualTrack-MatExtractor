@@ -1,10 +1,7 @@
 # DualTrack-MatExtractor: A Hybrid NLP-LLM Toolbox for Automated Alloy Data Extraction
 
 ## 📖 Graphical Abstract
-<img width="1048" src="https://github.com/zhaozixuan6678/DualTrack-MatExtractor/issues/4#issue-3505648743">
-
-
-
+<img width="1048" alt="3" src="[https://github.com/zhaozixuan6678/DualTrack-MatExtractor/issues/4#issue-3505648743]">
 
 
 
