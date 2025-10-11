@@ -1,7 +1,7 @@
 # DualTrack-MatExtractor: A Hybrid NLP-LLM Toolbox for Automated Alloy Data Extraction
 
 ## 📖 Graphical Abstract
-<img width="1048" alt="3" src="https://github.com/zhaozixuan6678/DualTrack-MatExtractor/issues/4#issue-3505648743">
+<img width="1048" alt="3" src="[https://github.com/zhaozixuan6678/DualTrack-MatExtractor/issues/4#issue-3505648743](https://private-user-images.githubusercontent.com/111862264/500137584-096dc3a3-ef41-43e4-bc67-78beec4b799c.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjAxODI0NzksIm5iZiI6MTc2MDE4MjE3OSwicGF0aCI6Ii8xMTE4NjIyNjQvNTAwMTM3NTg0LTA5NmRjM2EzLWVmNDEtNDNlNC1iYzY3LTc4YmVlYzRiNzk5Yy5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUxMDExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MTAxMVQxMTI5MzlaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT05NWY3M2Y0OWE3ZWQ4ZGU0YzlmM2JlNTFkMTBlNjE2ZmQ3ZDIyMjcwYzljNzMyMmM0MmZjN2UxZmQ1ZDE5NWVkJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.W2rkMJ7of8rRKO4jm0HW85r8yGOe0gdlq1MFHiuOqeg)">
 
 
 
