@@ -1,0 +1,320 @@
+Prompt for Streamlined Table-Processing:
+System_instruction: This task is to take the simplified table webpage as input and convert each cell in the table body to customised format and output it as the json document. Please directly give the answer without any analysis.
+Task: The customised format is <Table Title><Row Header><Column Header>=<Entry Value>, and if the table has multilayered header, extract corresponding header from outside to inside. 2 examples are given, just help you to understand the customised format. Webpage that are slightly different in symbols need you to process. Note:
+1.colspan and rowspan mean the cell occupies multiple columns or rows,
+2.morerows=x or morecols=x mean occupies (x+1) columns or rows,
+3.<entry>, <entry:&nbsp>, or no element exists after “:” mean a blank space should be leaved in the cell.
+Example:
+Input for Publishers of RSC, SN: {"Table 1":"Surface crack width.", "values": [["<thead><tr><th:Samples>", "<th colspan=6:Crack width (μm)></tr></thead>"], [["<tbody><tr><td rowspan=2:Ti-MA-GRa>", "<td:Maximum>", "<td:13.46>", "<td:Minimum>", "<td:7.21>", "<td:Mean width>", "<td:11.34></tr>"], ["<tr><td colspan=4: Self-healing ratio>", "<td colspan=2:68.25%></tr>"], ["<tr><td rowspan=2:Ti-MA-GNs>", "<td:Maximum>", "<td:11.70>", "<td:Minimum>", "<td:2.35>", "<td:Mean width>", "<td: 10.05></tr>"], ["<tr><td colspan=4:Self-healing ratio>", "<td colspan=2:71.86%></tr>"]]]}
+
+Output for Publishers of RSC, SN:
+{"Table 1: "Surface crack width."
+###<Samples><Ti-MA-GRa><Crack width (μm)> <Maximum>= <13.46>###, ###<Samples><Ti-MA-GRa><Crack width (μm)> <Minimum> =<7.21>###, ###<Samples><Ti-MA-GRa><Crack width (μm)><Mean width>=<11.34>###, ###<Samples><Ti-MA-GRa><Crack width (μm)><Self- healing ratio>=<68.25%>###, ###<Samples><Ti-MA-GNs><Crack width (μm)><Maximum>=<11.70>###, ###<Samples><Ti-MA-GNs><Crack width (μm)><Minimum>=<2.35>###, ###<Samples><Ti-MA-GNs><Crack width (μm)><Mean width>=<10.05>###, ###<Samples><Ti-MA-GNs><Crack width (μm)><Self-healing ratio>=<71.86%>###}
+
+Input for Publishers of E: {"title": "Table 1: Diffusion coefficient of Sm(III) ions", "values ":[["<thead><row><entry>", "<entry namest=col2 nameend=col7:D Sm(III)></row>"], ["< row><entry>", "<entry:T>", "<entry:673>", "<entry:698>", "<entry:723>", "<entry:773>","< entry:823></row></thead>"], [["<tbody><row><entry morerows=2:LiCl–KCl>", "<entry: CV>","<entry:4.1±0.8>", "<entry:–>", "<entry:7.0±1.5>", "<entry:10.4±2.7>", "<entry:11.0 ±3.9</row>"], ["<row><entry:Convolution>", "<entry:4.8±0.3>", "<entry:–>", "<entry:7.5 ±1.1>", "<entry:11.8±2.6>", "<entry:11.5±3.5></row>"], ["<row><entry:CP>", "<entry:4.5± 0.9>", "<entry: 5.4±0.8>", "<entry:7.5±0.9>", "<entry:10.1±2.1>", "<entry:11.9 ±1.2></row> "], ["<row><entry namest=col1 nameend=col7:></row>"]]]}
+
+Output for Publishers of E:
+ {"Table 1: "Diffusion coefficient of Sm(III) ions."
+###<Diffusion coefficient of Sm(III) ions.><D Sm(III)> <LiCl–KCl><CV><T><673>=<4.1±0.8>###,
+###<Diffusion coefficient of Sm(III) ions.><DSm(III)><T><LiCl–KCl><CV><698>= <->###,###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><DSm(III)><T><CV><723>=<7.0±1.5>###, ###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><DSm(III)><T><CV><773>=<10.4±2.7>###, ###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><DSm (III)><T><CV><823>=<11.0±3.9>###, ###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><DSm(III)><T><Convolution><673> =<4.8±0.3>###, ###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><D Sm(III)><T><Convolution><698>=<-> ###, ###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><D Sm(III)><T><Convolution><723>=<7.5±1.1>###, ###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><D Sm(III)><T><Convolution><773>=<11.8±2.6>###, ###<Diffusion coefficient of Sm(III) ions.><LiCl–KCl><D Sm(III)><T><Convolution><823>=<11.5±3.5>###, ###<Diffusion coefficient of Sm(III) ions.><D Sm(III)><LiCl– KCl><T><CP> <673>=<4.5±0.9>###, ###<Diffusion coefficient of Sm(III) ions.><D Sm(III)><LiCl–KCl><T><CP><698>=<5.4±0.8>###, ###< Diffusion coefficient of Sm(III) ions.><D Sm(III)><T><LiCl–KCl><CP><723>=<7.5±0.9>###, ###<Diffusion coefficient of Sm(III) ions.><D Sm(III)><T><LiCl–KCl><CP><773>=<10.1±2.1>###, ###<Diffusion coefficient of Sm(III) ions.><DSm(III)><T><LiCl–KCl> <CP><823>=<11.9±1.2>###}
+
+
+Prompt for Combined Structural Table-Processing: Combined-Table-Processing:
+System_instruction: Tables are in the format of ###<condition1><condition2><condition 3>...=<corresponding value>###. Combine information of each sample from different tables by combining overlapping conditions and summarize information of each investigated alloy and output in the structured format. Task: 1. If there are multiple alloy samples are mentioned, create separated structured format for each of them. 2. If any information of is not provided, just use "N/A".
+Example: Input: "{\"Table 1: \"Microstructural constituents of the studied alloy.\"
+\n###<Samples><700-PM><α laths (vol%)>=<81.8 ±  0.5>###, 
+\n###<Samples><700-PM><βt or β (vol%)>=<18.2 ± 0.4 (β)>###,
+\n###<Samples><880-PM><α laths (vol%)>=<75.0 ± 0.7>###, 
+\n### <Samples><880-PM><βt or β (vol%)>=<25.0 ± 0.7 (βt)>###}",
+"{\"Table 2: \"Tensile properties of different samples.\ "
+\n###<Samples> <700-PM><Microstructure>=<Fully lamellar>###,
+\n###< Samples><700-PM><YS (MPa)>=<815 ± 5>###,
+\n###<Samples><880-PM> <Microstructure>=<Basket-weave>###,
+\n###<Samples> <880-PM><YS (MPa)>=<910 ± 7>###}",
+"{\"Table 3: \"Composition of investigated alloy.\"
+\n###<Composition><Element><Al><wt%> =<2.83>###, 
+\n###<Composition>< Element><Zr><wt%>=<2.32>###, 
+\n###<Composition><Element> <Mo><wt%>=<2.17>###, 
+"\n, ###<Composition><Element><Ti> <wt%>=<Bal.>###}
+
+Output: JSON for Samples 700-PM: {"Composition": "Ti−2.83Al−2.32Zr−2.17Mo (wt%)", "microstructural constituents α laths (vol%)": "81.8 ± 0.5", "microstructural constituents βt or β (vol%)": "18.2 ± 0.4 (β)", "Microstructure": "Fully lamellar", "YS (MPa)": "815 ± 5"}
+JSON for Samples 880-PM: {"Composition": "Ti−2.83Al−2.32Zr−2.17Mo (wt%)", "microstructural constituents α laths (vol%)": "75.0 ± 0.7", "microstructural constituents βt or β (vol%)": "25.0 ± 0.7 (βt)", "Microstructure": "Basket-weave", "YS (MPa"): "910 ± 7"}
+<END>
+
+Prompt for Sample-Preparation Processing (Methodology Sections):
+System_instruction: Here are common information and heat treatment of alloy and their measuring units:
+1."Alloy_Designation/Alloy_Formula": alloy chemical formula or designation.
+2. "Heat-treated": heated to certain temperature for a period of time [°C/K, h/min].
+3. "Casting": casting temperature [°C/K].
+4. "Melting": melting temperature [°C/K].
+5. "Homo": homogenization, homogenized to certain temperature for a period of time [°C/K, h/min].
+6. "Annealing": annealing to certain temperature for a period of time [°C/K, h/min].
+7. "Solution-treated": solid-solution treated to certain temperature for a period of time [°C/K, h/min].
+8. "Quenching/cooling": Quenching/cooling in different materials [Water Quenching/Air Quenching/Oil Quenching/Hot Water Quenching].
+9. "Aging/Ageing": aging treated to certain temperature or room temperature for a period of time [°C/K, h/min/days]..
+10. "Rolling": Hot rolling or Cold Rolling, should exhibit rolling temperature [°C/K], total thickness reduction [%, mm], single pass reduction [%, mm], starting thickness[mm], final thickness[mm], rolling speed [mm/s], rolling passes [times] if mentioned.
+11. "Extrusion": Extrusion should exhibit extrusion temperature [°C/K], extrusion ratio, extrution bar diameter [mm], extrusion speed [mm/min], starting diameter[mm], final diameter[mm] if mentioned.
+12. "Forge": Forge should exhibit forge temperature [°C/K], final thickness [mm].
+Task: We already provide most of information about common processing conditions. Summarize the processing routes of each investigated alloy (operation actions and corresponding operation parameters), and some processing actions may not mentioned here you can refer to the provided information to summarize it. If there are multiple samples mentioned in the text, create separate JSON for each of them. If the treatment are repeated operated or operated in multi-stages, clearly summarize the information in each operation or each stage. for If any information is not provided, use "N/A". Output Json format directly, do not need any explanation !!!
+
+Example: Input: The study was carried out on the industrial 1.6 mm cold-rolled clad sheets of 1424 alloy and Al-5Zn-6Mg-3.2Cu alloys. 1424 alloy were solution treated at 460°C, 10 min, water quenched, stretched for a small degree and cold rolling to 0.9mm, followed by a prolonged natural ageing for 10 days (as-received temper). Al-5Zn-6Mg-3.2Cu alloy was solution treated at 2135k for 48 hours, then cooled to a given annealing temperature with a rate equal 50–60°C s−1. Annealing temperatures were 100–450°C (step 25°C). After that the sample were water quenched. Tensile properties were determined after a additional solid resolution and re-aging: 200 °C for 20 min with cooling in water (solid resolution step), followed by 24 h at 120 °C (re-aging step).
+Output: JSON for 1424 alloy:
+{"Alloy_Designation/Alloy_Formula": "1424 alloy",
+"Cold-Rolling": "final thickness: 1.6 mm",
+"Solution-treated": "460°C, 10 min",
+"Water Quenching": "Yes",
+"Stretching": "Small Degree",
+"Cold-Rolling": "final thickness: 0.9 mm",
+"Natural Aging": "10 days".}
+JSON for Al-5Zn-6Mg-3.2Cu alloy:{ "Alloy_Designation/Alloy_Formula": "Al-5Zn-6Mg-3.2Cu alloy",
+"Cold-Rolling": "final thickness: 1.6 mm",
+"Solution-treated": "2135k, 48 hours",
+"Cooling": "final temperature: given annealing temperature, cooling rate: 50–60°C s−1",
+"Annealing": "100–450°C, step 25°C",
+"Water Quenching": "Yes",
+"Solid Resolution and Re-aging": "Solid Resolution: 200 °C, 20 min, water cooling; Re-Aging: 120 °C, 24 h".}
+<END>
+
+Prompt for Discussions&Results Processing (Discussions&Results Sections):
+System_instruction: Here are some common properties of alloy and their measuring units:
+1. "Alloy_Designation/Alloy_Formula": alloy chemical formula or designation.
+2. "State": the corresponding processing sate.
+3. "Tensile properties": ultimate tensile strength (UTS,σb) [MPa], yield strength (YS,σs) [MPa], elongation (El,δ) [%], compressive strength (σbc) [MPa], bending strength (σbb) [MPa].
+4. "Tensile Modulus": Young’s modulus/elastic modulus (E) [GPa], shear modulus (G) [GPa], poisson’s ratio (ν), flexural modulus [GPa].
+5. "Mechanical Properties": Other mechanical properties, such as hardness [HV, HRB, HB], reduction of area (KQ) [%], conductivity (EC) [%IACS].
+6. "Corrosion Properties": corrosion potential (Ecorr) [VsCE], corrosion current density (Icorr) [A/cm2], stress corrosion critical stress intensity factor (KISCC) [MPa/m^1/2], stress corrosion sensitivity factor (ISSRT) [%].
+7. "Fracture Behaviour": fracture toughness (KIC) [MPa·m^1/2], toughness [J/m3], fatigue strength [MPa], fracture mode [brittle/ductile].
+8. "Microstructure": average grain size [μm], microstructure [bcc/fcc/hcp], strengthening phase, size and distribution of precipitation [Finer/ Uniformly], grain boundary characteristics[High-angle/Small-angle].
+9. "Strengthening Mechanism": Grain strengthening, Dislocation strengthening, Precipitation strengthening, Solid–solution strengthening.
+Task: We already list most of common properties of alloy. Summarize properties and states of each investigated alloy, and some properties may not mentioned here you can refer to the provided information to summarize it. Your should output the Alloy_Designation/Alloy_ Formula and processing states at the beginning in the JSON format, and if not provided, use "N/A". If there are multiple samples mentioned in the text, create separate JSON for each of them. Output Json format directly, do not need any explanation !!!
+Example: Input: The average grain diameters of the GH0, GH1-composite specimens were 6.9 and 6.6 μm, respectively. Fig. 12 shows the tensile test results of GH0 and GH1-composite specimens at ambient temperature (25 °C) and elevated temperature (900 °C). At ambient temperature, a relatively low yield strength (YS: 587 MPa), ultimate tensile strength (UTS: 690 MPa) and elongation (El: 6.6%) of GH0 may be attributed to cracking defects in the specimens. In contrast, the GH1-composite specimens showed a significant improvement in YS and UTS values, up to 882 and 1214 MPa, respectively. The El value of GH1-composite (14.2%) was also over twice that of GH0 (6.6%). Compared with GH0, the tensile properties of GH1-composite at ambient temperature were significantly improved, mainly because of the elimination of cracks and the addition of 1 wt% TiB2 particles. At elevated-temperature conditions, the YS and UTS of GH0 and GH1- composite specimens both decreased significantly. The YS values of GH0 and GH1-composite were 173 and 288 MPa, respectively, and their UTS values were 213 and 352 MPa, respectively. The El values of GH1-composite at elevated temperature was 36.8%, which was significantly higher compared to the ambient-temperature condition, which was mainly due to the large number of cracks in the GH1 specimens.
+Output: JSON for GH0 specimen: {"alloy_designation/alloy_formula": "GH0",
+"state": "N/A",
+"average grain diameter": "6.9 μm",
+"yield strength at 25 °C": "587 MPa",
+"ultimate tensile strength at 25 °C": "690 MPa",
+"elongation at 25 °C": "6.6%",
+"yield strength at 900 °C": "173 MPa",
+"ultimate tensile strength at 900 °C": "213 MPa",
+"elongation at 900 °C": "N/A".}
+JSON for GH1-composite specimen: {"alloy_designation/alloy_formula": "GH1-composite, 1 wt% TiB2 particles addition",
+"state": "N/A",
+"average grain diameter": "6.6 μm",
+"yield strength at 25 °C": "882 MPa",
+"ultimate tensile strength at 25 °C": "1214 MPa",
+"elongation at 25 °C": "14.2%",
+"yield strength at 900 °C": "288 MPa",
+"ultimate tensile strength at 900 °C": "352 MPa",
+"elongation at 900 °C": "36.8%".}
+<END>
+
+Prompt for Pre-structured “CPSP” Information Extraction:
+System_instruction: Here are the Customised JSON format:
+JSON for ...: {"Composition": ".../measuring unit","Processing": "step1:...; step2:...; ...""Microstructure": {{Category1:{propertyX: valueX/measuring unit, propertyY: valueY/measuring unit...}}, {Category2:{propertyZ: valueZ/measuring unit ...}}, ...},"Performance": {{Category1:{propertyX:...,propertyZ:...}}...},"Strengthening_Mechanism": "...","Others": "..."}.
+Each JSON should contains:
+1.Composition: alloy_designation/formula, like AA7055, Cu-3Ni-0.25Si, or specific content like "Ti:84.727/wt.%, Mo:6.9/wt.%, Nb:7.8/wt.%";
+2.Processing: "Operation1: conditions (°C/K, h/min, rate/%, speed/(mm/min) ...), Operation2: conditions ...";
+3.Microstructure: average grain size[μm], microstructure[bcc/fcc/hcp], strengthening phase, size and distribution of precipitation[Finer /Uniformly], grain boundary characteristics[High-angle/Small-angle];
+4.Performance: mechanical properties (UTS,σb/MPa, YS,σs/MPa, El,δ/%, compressive strength,σbc/MPa, Young’s modulus/GPa, poisson’s ratio/ν, conductivity,EC/%IACS), corrosion properties (Ecorr/VsCE, Icorr/(A/cm2), KISCC/(MPa/m^1/2), ISSRT/%), fracture behaviour (fracture toughness,KIC/(MPa·m^1/2), fracture mode/(brittle/ductile)).
+5.Strengthening Mechanism: grain strengthening, dislocation strengthening, precipitation strengthening, solid–solution strengthening.
+Task: Provided text are abstract, tables in the format of  ###<condition1><condition2><condition3>...=<corresponding value>###,
+and json extracted from methodology and discussions. Summarize each alloy sample follows the customised JSON format:
+1. If multiple samples mentioned, create separate JSON for each of them.
+2. If any info not provided, use N/A; if not sure, which group it should be, put it into Others.
+3. Each Property follows: property name: value/measuring unit, use abbreviation if mentioned.
+4. Nested structure follows {{CategoryX: {...}}, {CategoryY: {...}}}.
+5. Same category of info output in the same line.
+6. Output complete processing from preparation for each sample as possible.
+Note: Do not omit and output complete info for each, and Output Json format directly as possible, do not need any explanation!!!
+Example: Input: {"abstract": "To improve formability and hardness of AA6061 alloy formed by single point incremental forming (SPIF), solid solution/aging/SPIF cycles have been investigated."}.
+{Table 1: Composition of the alloy studied (in wt.%): ###<AA6061><wt.%><Al>=<Base>###,  ###<AA6061><wt.%><Si>=<0.73>###,  ###<AA6061-Sc><wt.%><Al>=<Base>###, ###<AA6061-Sc><wt.%><Sc>=<0.04>###} {"SPIF": {"Shape": "truncated pyramid"}, "Heat_Treatment": {"Solution Treatment": {"Temperature Range": "530°C to 560°C", "Time Range": "30 min to 120 min", "Solidus Point": "580°C" }, "Artificial Aging": "180°C for 6 h", "SPIF": "truncated pyramid with 50° and 70° wall angles"}}, {"AA6061-Sc": {"Solution+Aging":"Grain Size": {"Solution+Aging": {"530°C,120 min":"20.48","545°C,75 min+50°SPIF":"21.69"}} {"Alloy_Designation": "AA6061", "formability": {"Improvement": "Best for 530°C at 100 min solution treatment"}, "Mechanical properties": {"hardness": "81.8 HV"}, "Corrosion": {"Ecorr/mV": "-420", "Icorr/μA": "0.21"}}
+Output: JSON for AA6061-Sc-1:
+{"Composition": "Al: Base, Sc: 0.04/wt.%",
+"Processing": "solid solution: 530°C/120 min; aging: 180°C/6 h",
+"Microstructure": "grain size: 20.48",
+"Performance": "N/A",
+"Strengthening_Mechanism": "N/A",
+"Others": "N/A"}
+JSON for AA6061-Sc-2:
+{"Composition": "Al: Base, Sc: 0.04/wt.%",
+"Processing": "solid solution: 545°C/75 min; aging: 180°C/6 h; SPIF: truncated pyramid 50°",
+"Microstructure": "grain size: 21.69",
+"Performance": "N/A",
+"Strengthening_Mechanism": "N/A",
+"Others": "N/A"}
+JSON for AA6061-1:
+{"Composition": "Al: Base, Si: 0.73/wt.%",
+"Processing": "solid solution: 530°C/100 min; aging: 180°C/6 h",
+"Microstructure": "N/A",
+"Performance": {{Mechanical properties: {formability: Best, hardness: 81.8/HV}}, {Corrosion properties: {Ecorr: -420/mV, Icorr: 0.21/μA}}, "Strengthening_Mechanism": "N/A",
+"Others": "N/A"}
+<END>
+
+Prompt for the Structured Composition Extraction:
+System_instruction: Two common format of alloy formula:
+1.Alloy formula with “-” symbol, default measuring unit of  that is "wt.%" if not mentioned, and usually the first element has the balanced content, and the content of the other element is the number in front of the element, for example: the composition of Al-6.5Cu-2.7 Mn is Al: Bal/wt.%, Cu: 6.5/wt.%, Mn: 2.7/wt.%, the composition of Cu-Ni-Sn is Cu: Bal/ wt.%, Ni: N/A/wt.%, Mn: N/A/wt.%, the composition of Ti–51.8 at.% Ni is Ti: bal/at.%, Ni:51.8/at.%.
+2.Alloy formula without “-” symbol, default measuring unit of  that is "at.%", and the content of the other element is the number behind the element, for example the composition of Ti47.5Al48Nb3Ta1.5 is Ti:47.5/at.%, Al:48/at.%, Nb:3/at.%, Ta:1.5/at.%. Exception: AlSi 10Mg, AlSi7Mg series, the content of Al is Bal/wt.%, Mg is N/A/wt.%, and Si is 10 wt.%, and 7 wt.%, respectively. TiAlV series, for example Ti6Al4V, the default content unit of TiAlV series is wt.%.
+Task: Summarize common alloy composition information from the provided text into customized JSON format: "Alloy":"{"Alloy Formula":"{}","States":"{}", "Composition": "{ "Element1":"value/unit","Element 2":"value/unit"...}", "Others": ""}".
+Note: 1. Output customized JSON directly, do not provide any explanation !!!
+1.If the format of Alloy Formula is not mentioned here, do not split the Alloy Formula into composition.
+2.if the info not belongs to Alloy Formula, States and Composition, output in "Others".
+3.If not provided related info, output "N/A".
+Example: Input: Sample Name: Specimen 2 (Al-6.5Cu-Mn-Sc) As-extruded and Aging: 175°C for 24h.
+Output: "Alloy":"{"Alloy Formula":"{Al-6.5Cu-Mn-Sc}","States":"{As-extruded and Aging: 175°C for 24h }", "Composition":"{"Al":"Bal/at.%", "Cu":"6.5/wt.%", "Mn":"N/A/wt.%", "Sc":"N/A/wt.%"}","Others":"N/A"}"
+<END>
+
+Prompt for Structured Heat Treatment Extraction:
+System_instruction: Common heat treatment (HT) are Melting, Casting, Austenitization, Transformation, Homogenization, Heat treatment, Solution, Artificial Aging/Aging, Isothermal Aging, Pre-Aging, Retrogression, Re-aging, Natural Aging, Creep Aging, Cooling, Quenching,
+Task: Summarize heat treatment from the provided text in the customized JSON format: "Melting": {"Method": "{}", "Equipment":"{}","Temperature": "{value/unit}", "Atmosphere": "{Vacuum/... gas}"},
+"Casting": {"Method": "{}","Temperature": "{value/unit}", "Diameter": "{}"},
+"Austenitization": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Transformation": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Homogenization": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Heat treatment": {"Name":"{}", "Temperature": "{value/unit}", "Time": "{value/unit}", "HeatingRate": "{value/unit}"},
+"Solution": {"Temperature": "{value/unit}", "Time": "{value/unit}", "HeatingRate": "{value/unit}"},
+"Artificial Aging": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Isothermal Aging": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Pre-Aging": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Retrogression": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Re-aging": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Natural Aging": {"Temperature": "{value/unit}", "Time": "{value/unit}"},
+"Creep Aging": {"Temperature": "{value/unit}", "Time": "{value/unit}", "Stress": "{value/unit}"},
+"Cooling": {"Air Cooling/Furnace Cooling/Oil Cooling/Water Cooling"},
+"Quenching": {"Water quenching/Air Quenching/Oil Quenching"},
+Note: 1. If any HT not provided, not create customized JSON, and if any operation info of the HT, not provided, use N/A.
+2.Some HT not mentioned, refer to the customized JSON to create it in "Heat treatment", and "Name" is the name of the operation.
+3.If multiple info for specific operation, such as multiple temperature, output as: value1/unit, value2/unit, value3/unit ...
+4.Synonyms or simplified form of the operation are the same kind of HT.
+5. Do not create JSON for hot deformation, only output processing related heat treatment.
+6. Stress Aging is creep aging.
+7. Output Json directly as possible, do not provide any explanation !!!
+Example: Input: Semi-continuous Casting, heat-treated at 200°C, Water Quenched, Annealing at 180°C for 0.5h with Air Cooling, Re-Aging: 100, 120, 150°C for 4, 8, 12h.
+Output: "Casting": {"Method": "{Semi-continuous Casting}","Temperature": "{N/A}", "Diameter": "{N/A}"},
+"Heat treatment": {"Name":"{N/A}","Temperature": "{200/°C}", "Time": "{N/A}"},"Quenching": {"Water quenching"}, "Heat treatment": {"Name":"{Annealing}", "Temperature": "{180/°C}", "Time": "{0.5/h}", "HeatingRate": "{N/A}"},
+"Cooling": {"Air Cooling"},"Re-aging": {"Temperature": "{100/°C, 120/°C, 150/°C}", "Time": "{4/h, 8/h, 12/h}"}.
+<END>
+
+Prompt for Structured Deformation and Manufacturing Processing Extraction:
+System_instruction: Common Deformation (D) and Manufacturing Processing (MP),  Preparation Processing (PP) are Rolling, Extrusion, Forge, Pressing/Compression, Severe Plastic Deformation (SPD), Other Deformation, Spray Processing, Deposition, Friction Processing, Laser Processing, Alloying, Other Manufacturing/Preparation Processing,
+Task: Summarize D, MP, PP from the provided text into the customised JSON format:
+"Rolling": {"Method": "{}","Temperature": "{value/unit}", "Starting Thickness": "{value/ unit}", "Final Thickness": "{value/unit}", "Thickness Reduction Ratio": "{value/unit}"},
+"Extrusion": {"Method": "{}", "Temperature": "{value/unit}", "Extrusion Ratio": "{value/ unit}", "Extrusion Speed": "{value/unit}"},
+"Forge": {"Method": "{}", "Temperature": "{value/unit}", "Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit ... }"},
+"Pressing/Compression": {"Method":"{}","Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit ... }"},
+"Severe Plastic Deformation": {"Method": "{}","Temperature": "{value/unit}", "Stress": "{value/unit}","Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit ... }"},
+"Other Deformation": {"Name":"{}","Temperature": "{value/unit}","Deformation Ratio": "{value/unit}", "Deformation Speed": "{value/unit}"},
+"Spray Processing": {"Method": "{}","Temperature": "{value/unit}","Time": "{value/ unit}", "Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit ... }"},
+"Deposition": {"Method": "{}","Parameters": "{Parameter1: value/unit, Parameter2: value/unit, Parameter3: value/unit}"},
+"Friction Processing": {"Name":"{}","Rotation speed": "{value/unit}","Processing speed": "{value/unit}","Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit  ... }"},
+"Laser Processing": {"Name":"{}","Laser Power": "{value/unit}","Scan Speed": "{value/unit}","Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit  ... }"},
+"Alloying": {"Name":"{}","Time": "{value/unit}","Rotation speed": "{value/unit}","Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit  ... }"},
+"Other Manufacturing/Preparation Processing": {"Name":"{}","Other Parameters": "{Parameter1: value/unit, Parameter2: value/unit  ... }"},
+Note: 1. If any processing not provided, not create customised JSON,  and if any operation info of the processing, not provided, use N/A.
+2.Some deformation and manufacturing/preparation processing not mentioned, refer to the customised JSON to create it in "Other Deformation" and "Other Manufacturing/Preparation Processing", and "Name" is the name of the operation.
+3.If multiple info for specific operation, such as multiple temperature, output as: value1/unit, value2/unit, value3/unit ...
+4.Synonyms or simplified form of the operation are  the same kind of processing.
+5.Do not create JSON for heat treatment, only output processing related with D, MP, PP !!!
+6.ECAP, HPT, ARB is SPD.
+7.Output Json directly as possible, do not provide any explanation !!!
+Example: Input: Forging process: holding temperature: 1050°C, holding time: 40 min, initial forging temperature: 1050°C, final forging temperature: 900°C, forging ratio: 8:1, cooling method: Air cooling. Ball-milling: 20 min, 260 rpm, ball to powder ratio 5:1; Aging:850°C, Exposure:760°C for 500 and 1000 hours.
+Output: "Forge": {"Method": "{Forging}", "Temperature": "{1050/°C, 900/°C}", "Other Parameters": "{Time: 40/min, Forging ratio: 8:1/N/A}"}, "Other Manufacturing/Preparation Processing": {"Name":"{Ball-milling}","Other Parameters": "{Time: 20/min, Rotation Speed: 260/rpm, ball to powder ratio: 5:1/N/A}"}.
+<END>
+
+Common Microstructural Characteristics of Alloy:
+Atomic Scale:
+"Lattice": "{"1": "{"Name":"{Matrix/...Phase}","Structure": "{BCC/FCC...}","Lattice constants":"{Parameter1: value/unit, Parameter2: value/unit ...}","Others":"{Parameter1: value/unit, Parameter2: value/unit ... }"}",
+"2": "{"Name":"{Matrix/...Phase}","Structure":"{...}","Lattice constants":"{...}","Others": "{...}"}"...}",
+Atomic Scale to Nano Scale:
+"Solute-Atoms Features": "{"1":"{"Name":"{GP zones/PFZ/GBP}","Average Size": "{value/ unit}","Width":"{value/unit}", "Others":"{Parameter1: value/unit, Parameter2: value/ unit ... }"}",
+{"2": "{"Name": {...}","Average Size":"{...}","Width":"{...}", "Others": "{...}"}"...}",
+Nano Scale: 
+"Grain Boundary": {"1":"{"Name":"{High-Angle Grain Boundary/Low-Angle}", "Proportion":"{value/unit}}", "2":"{"Name":"{High-Angle Grain Boundary/Low-Angle}", "Proportion":"{value/unit}"}",
+"Phase Interfaces":"{"1":"{"Precipitate":"{}", "Interface":"{Coherent/Semi-coherent/ Incoherent}","2":"{"Precipitate":"{}", "Interface":"{...}"...}"
+"Precipitate and Distribution":"{"1":"{"Precipitates":"{}","Precipitates size": "{value/unit) ","Morphology":"{Spherical/Plate -like/Rod-like/Needle-like..}", "Distribution":"{Homogeneous/Heterogeneous/Uniform ... distributed in ... }"}",
+"Dislocation":"{"Density":"{value/unit}","Structure":"{}","Distribution":"{...}"}",
+"Defect":"{"Description":"{...}"}",
+Micro-Scale: 
+"Grain Characteristics":"{"Grain size":"{value/unit}","Grain shape":"{Equiaxed/ Columnar...}"}",  
+"Texture":"{"Orientation":"{value/unit}"}",
+Sub-Macroscopic and Macroscopic Scale: 
+"Microstructure":"{"Description":"{...}"}",
+"Segregation":"{"Description":"{...}"}",
+"Zones and Deformation Bands":"{"1":"{"Name":"{}", "Description":"{}"}", "2":"{"Name": "{}","Description": "{}"} "...}",
+"Fracture":"{"State":"{}","Fracture mode":"{Brittle/Ductile/...}"}",
+"Crack":"{"Crack propagation":"{}","Description":"{...}"}"
+
+Prompt for the Extraction of Structured Microstructural Characteristics: 
+System_instruction: Common microstructural characteristics of alloy, such as characteristics of precipitate, solute-atoms clustering, grain boundary, dislocation, defect, texture, microstructure, segregation, zones and deformation bands, fracture behavior, crack. 
+Task: Summarise microstructure characteristics of alloy from the provided text into the customised JSON format: 
+"Precipitate":"{"1":"{"Name":"{Matrix/...Precipitates/...Phase}","Structure": "{BCC/FCC...}","Lattice constants":" {Parameter1: value/unit, Parameter2: value/unit...}","Size":"{value/unit)", "Morphology":"{Spherical/Plate-like/Rod-like /Needle-like...}", "Distribution":"{Homogeneous/Heterogeneous/Uniform...distributed in...}","Interface":"{Coherent/Semi- coherent/Incoherent}","Description":"{...}","Others":"{Parameter1: value/unit, Parameter2: value/unit...}"}", "2":"{"Name ":"{}","Structure": "{}","Lattice constants":"{}","Size":"{)","Morphology":"{}", "Distribution":"{}","Interface":"{}", "Description":"{}","Others":"{}"}"...}", 
+"Solute-Atoms":"{"1":"{"Name":"{GP zones/PFZ/GBP/...}","Width":"{value/unit}","Description":"{}","Others":"{Parameter 1: value/unit, Parameter 2: value/unit...}"}", "2":"{"Name":"{}","Width":"{}", "Description": "{}","Others ":"{} "}"...}",
+"Grain Boundary": {"1":"{"Kind":"{High-Angle/Low-Angle}", "Proportion":"{value/unit}}", "2":"{"Kind":"{High-Angle/ Low-Angle}", "Proportion":"{value/unit}"}", "Description":"{} "}"
+"Grain Characteristics":"{"Average Grain size":"{value/unit}","Grain shape":"{Equiaxed/ Columnar...}","Description": "{}","Others":"{Parameter1: value/unit, Parameter2: value/ unit...}"}",  
+"Microstructure":"{"Characteristic":"{Parameter 1: value/unit, Parameter 2: value/ unit ... }"  ,"Description":"{}"}","Texture":"{"Orientation":"{value/unit}","Description":"{}","Others":"{Parameter1:value/unit, Parameter2: value/ unit ...}"}","Dislocation": "{"Density": "{value/unit}", "Structure":"{}", "Distribution":"{}","Description":"{}", "Others":"{Parameter1:value/unit,Parameter2:value/unit...}"}", "Defect":"{"Parameters": "{Parameter1: value/unit, Parameter2: value/unit...}","Description":"{}"}", "Segregation":
+ "{"Composition":"{}","Parameters":"{Parameter1: value/unit, Parameter 2:value/unit ...}"," Description":"{}"}","Zones and Deformation Bands":"{"1":"{"Name":"{Heat Affected Zone/Shear Band/...}","Parameters":"{Parameter1: value/ unit, Parameter2: value/unit ...}","Description":"{...}"}","2":"{"Name":"{}","Parameters":"{}","Description":"{}"} "...}","Fracture":"{"State":"{}","Fracture mode":"{Brittle/Ductile/...}", "Parameters": "{Parameter 1: value/unit, Parameter2: value/ unit...}","Description":"{}"}", "Crack": 
+"{"Crackpropagation":"{}","Parameters":"{Parameter1: value/unit, Parameter2: value/ unit...}","Description":"{}"}". 
+Note: 1. Output Json directly as possible, do not provide any explanation !!!
+2.If any kind of microstructure characteristics not provided, not create customised JSON.
+3.Some microstructure characteristics not mentioned here, refer to customised format to create it into "Microstructure" JSON, and "Characteristic" is the name of microstructure characteristic.
+4.Synonyms or simplified form of the parameters are same, such as Heat Affected Zone is HAZ.
+5. Matrix is the default parameter of Precipitate Name in "Precipitate".
+Example: Input: {phases:{bcc Fe: N/A, bcc Mo: N/A}, lattice_parameters: {Fe: 2.865/Å, Mo: 3.146/Å}, average_particle _size: {Fe: 12/6/6 nm, Mo: 15/8/8 nm}, magnetic_phase_transformation: ferromagnetic α-Fe to paramagnetic Fe, milling_ time_for_complete_transformation:4h}. Phase composition: α-Ti, β-Ti, TiC, grain refinement is distinct, α phase distribution: Dispersed in β phase, α phase forms: Fine needle shape, Long strip shape, Approximate equiaxed shape. {IMC_Layers: Thinner IMC layers compared to TiO2-free solder joints, Thickness_Trend is decrease with aging temperature and time up to 0.1 wt% TiO2}. 
+Output: "Precipitate":"{"1":"{"Name":"{Fe}","Structure": "{BCC}","Lattice constants":"{2.865/Å}", "Size":"{12/6/6 nm)","Morphology":"{N/A}","Distribution":"{N/A}","Interface":"{N/A}","Description":"{N/A}","Others":"{magnetic_phase_transformation: ferromagnetic α-Fe to paramagnetic Fe, milling_time_for_complete_transformation: 4h}"}", "2": "{"Name":"{Mo}","Structure": "{BCC}","Lattice constants":"{3.146/Å}", "Size":"{)","Morphology":"{15/8/8 nm}", "Distribution":"{N/A}", "Interface":"{N/A}", "Description":"{N/A}","Others":"{magnetic_phase_transformation: ferromagnetic α-Fe to paramagnetic Fe, milling_time_for_complete_transformation: 4h}"}", "3":"{"Name":"{α-Ti}", "Structure": "{N/A}","Lattice constants":"{N/A}", "Size":"{N/A)","Morphology":"{Fine needle shape, Long strip shape, Approximate equiaxed shape}","Distribution":"{Dispersed in β phase}", "Interface":"{N/A}", "Description": "{grain refinement is distinct}","Others":"{N/A}"}", "4":"{"Name":"{β-Ti}","Structure": "{N/A}","Lattice constants":"{N/A}", "Size":"{N/A)","Morphology":"{N/A}","Distribution":"{N/A}", "Interface":"{N/A}", "Description": "{grain refinement is distinct}","Others":"{N/A}"}", "5":"{"Name":"{TiC}","Structure": "{N/A}","Lattice constants":"{N/A}", "Size":"{N/A)", "Morphology":"{N/A}","Distribution":"{N/A}", "Interface":"{N/A}", "Description": "{grain refinement is distinct}", "Others":"{N/A}"}", "Microstructure":"{"IMC_Layers":"{IMC_Layers: Thinner IMC layers compared to TiO2-free solder joints}","Description":"{Thickness_Trend is decrease with aging temperature and time up to 0.1 wt% TiO2}"}".
+<END>
+
+Prompt for the Extraction of Structured Alloy Properties:
+System_instruction: Common alloy properties (Intrinsic characteristics of an alloy determined by its composition, structure, and processing) are mechanical properties, physical properties, magnetic properties, thermodynamic properties, and other properties.
+Task: Summarise common alloy performance from the provided text into the customised JSON format:
+"Mechanical Properties":"{"1":"{"States":"{}","YS":"{value/unit}","UTS":"{value/unit}","Elongation":"{value/unit}", " CompressiveStrength":"{value/unit}","Compressive strain":"{value/unit}","Fracture strength":"{value/unit}","Fracture strain":"{value/ unit}","Reduction of area":"{value/unit}","Hardness":"{value/unit}","Young’s modulus":"{value/unit}", "Shear modulus":"{value/unit}","Flexural modulus":"{value/unit}","Poisson’s ratio":"{value/unit}","Description":"{}", "Others":"{Parameter1: value/unit, Parameter2: value/unit...}"}","2":"{"States": "{}","YS":"{}","UTS":"{}","Elongation ":"{}","Compressive Strength":"{}","Compressive strain":"{}","Fracture strength":"{}", "Fracture strain": "{}","Reduction of area": "{}","Hardness": "{}","Young’s modulus": "{value/unit}","Shear modulus":"{}","Flexural modulus":"{}","Poisson
+’s ratio":"{}","Description":"{}","Others":"{}"}"...}",
+"Physical Properties":"{"1":"{"States":"{}","Density":"{value/unit}","Melting point":"{value/unit}","ElectricalConductivity
+":"{value/unit}","Electrical resistivity":"{value/unit}","Description":"{}","Others":"{Parameter1: value/unit, Parameter2: value/unit...}"}","2":"{"States":"{}","Density":"{}","Melting point":"{}","Electrical Conductivity":"{}","Electrical 
+resistivity":"{}","Description":"{}","Others":"{}"}"...}"
+"Magnetic Properties":"{"1":"{"States":"{}","Remanent Magnetic Induction/Br":"{value/unit}", "Coercivity/Hc": "{value/ 
+unit}","SaturationMagnetization/Ms":"{value/unit}","Magnetization Finish/Mf":"{value/unit}","Description":"{}", "Others"
+:"{Parameter1:value/unit,Parameter2:value/unit...}"}","2":"{"States":"{}","RemanentMagneticInduction/Br":"{}","Coercivity/Hc":"{}","Saturation Magnetization/Ms":"{}","Magnetization Finish/Mf": "{}","Description":"{}", "Others":"{}"}"...}"
+"Thermodynamic Properties":"{"1":"{"States":"{}","Mixing Enthalpy":"{value/unit}","Mixing Entropy":"{value/unit}", "Heat Capacity":"{value/unit}","Thermal conductivity":"{value/unit}","Thermal expansion":"{value/unit}","Thermal diffusivity":"{value/unit}","Curie Temperature": "{"Object":"{...phase/Martensitic/...}", "Temperature":"{value/unit}", "Description":"{}"}","Transformation temperature":"{"Object":"{... phase/Martensitic/...}","Temperature":"{value /unit}"}", "Description":"{}","Others":"{Parameter1: value/unit, Parameter2: value/unit ...}"}","2":"{"States":"{}","Mixing Enthalpy ":"{}","Mixing Entropy":"{}","Heat Capacity":"{}","Thermal conductivity":"{}","Thermal expansion":"{}","Thermal diffusivity":"{}","Curie Temperature":"{"Object":"{... phase/Martensitic/...}","Temperature":"{}","Description":"{}"}", "Transformation temperature":"{"Object":"{... phase/Martensitic/...}","Temperature":"{}","Description":"{}","Others"
+:"{}"}"...}"
+Note: 1. Do not create JSON for impact, fatigue, failure/fracture, creep, corrosion, wear, high temperature performance and dynamic load.
+2.Output customized JSON directly, do not provide any explanation !!!
+3.If any kind of alloy properties not provided, not create customised JSON,  and if the value between "{" and "}" is empty, such as "Mixing Enthalpy":"{}", do not output this characteristic.
+4.Synonyms or simplified form of the parameters are the same, such as σb, UTS, tensile strength/TS are ultimate tensile strength.
+Example: Input: {Vickers microhardness: {Fusion zone: 488/Hv, HAZ: 462–471/Hv}, Cryogenic tensile property: {YS: 1177/MPa, UTS: 1310/MPa, Fractured position is Base metal}}, {T4: {YS: 166.1/MPa,  HV: 90}, T4+BH: {YS: 224.0/MPa, HV: 93, △YS: 57.9/MPa, △HV: 3}, {heat capacity: {600 K: N/A, 920-930 K: N/A}, enthalpy of formation: {910-930 K: {x=2/3: 40.3/J.mol-at−1, x=4/3: 37.6/J.mol-at−1}}, {corrosion properties:{Precipitation Enthalpy of Al2Cu: Roll-cast State: 10.3/J/g, After Heat Treatment: 2.93/J/g}}.
+Output: "Mechanical Properties":"{"1":"{"States":"{Fusion zone}","Hardness":"{488/HV}"}", "2":"{"States":"{HAZ}", "Hardness":"{462–471/Hv}"}","3":"{"States":"{T4}","YS":"{166.1/MPa}","Hardness":"{90/HV}"}", "4":"{"States": "{T4+ BH}", "YS": "{224.0/MPa}", "Hardness":"{93/HV}"}"}","Other Properties":"{"1":"{"States":"{Cryogenic tensile property}","Property Name":"{YS}","Property Value":"{1177/MPa}"}","2":"{"States":"{Cryogenic tensile property} ","Property Name":"{UTS}", "Property Value":"{1310/MPa}"}","3":"{"States":"{Cryogenic tensile property}", "Description":"{Fractured position is Base metal}"}"}","Thermodynamic Properties":"{"1":"{"States":"{600 K}","Heat Capacity":"{N/A}"}", "2":"{"States":"{920-930 K}","Heat Capacity":"{N/A}"}","3":"{"States":"{910-930 K}", "Others": "{Enthalpy of formation: x=2/3: 40.3/J.mol-at−1, Enthalpy of formation: x=4/3: 37.6/J.mol-at−1}"}"}".
+<END>
+
+Prompt for the Extraction of Structured Service Performance: 
+System_instruction: Common alloy performance (How a material behaves in a specific environment or application) are impact performance, fatigue performance, failure/fracture performance, creep performance, corrosion performance, wear performance, high temperature performance and dynamic load. 
+Task: Summarize common alloy performance from the provided text into the customized JSON format:  
+"Impact":"{"1":"{"States":"{}","Impact Toughness":"{value/unit}","Impact Energy": "{value /unit}", "Impact Strength": "{value/unit}","Description":"{}","Others":"{Parameter1: value/ unit, Parameter2: value/unit...}"}","2":"{"States":"{}", "Impact Toughness":"{}","Impact Energy":"{}","Impact Strength":"{}", "Description":"{}","Others":"{}"}"...}",
+"Fatigue":"{"1":"{"States":"{}","Cycles/Nf":"{value/unit}","Stress":"{value/unit}","StrainAmplitude":"{value/unit}","Description":"{}","Others":"{Parameter1:value/unit,Parameter2:value/unit...}"}","2":"{"States":"{}","Cycles/Nf":"{}","Stress":"{}","StrainAmplitude":"{}","Description":"{}", "Others": "{}"}"...}",
+"Failure/Fracture":"{"1":"{"States":"{}","Failure/Fracture mode":"{}","Elongation at failure": "{}","Fracture morphology ":"{}","Description":"{}","Others":"{Parameter1: value/unit, Parameter2: value/unit...}"}", "2":"{"States":"{}", "Failure/ Fracture mode":"{}","Elongation at failure":"{}","Fracture morphology":"{}", "Description":"{}", "Others": "{}"}"...}",
+"Creep":"{"1":"{"States":"{}","Stress":"{value/unit}","Life":"{value/unit}","Creep Strain": "{value/unit}","Steady State Creep Rate": "{}","Description":"{}","Others":"{Parameter 1: value/unit, Parameter2: value/unit...}"}", "{"2": "{"States": "{}", "Stress":"{}", "Life":"{}", "Creep Strain":"{}","Steady State Creep Rate": "{}","Description":"{}","Others":"{}"}"...}",
+"Corrosion":"{"1":"{"States":"{}","Ecorr":"{value/unit}","Icorr":"{value/unit}","Epit":"{value/unit}","Epp":"{value/unit}","Ecp":"{value/unit}","Icrt":"{value/unit}","Etp":"{value/unit}","SCC Susceptibility": "{}","Description": "{}","Others": "{Parameter1: value /unit, Parameter2: value/unit...}"}","2":"{"States":"{}","Ecorr":"{}","Icorr":"{}","Epit":"{}", "Epp ":"{}","Ecp":"{}","Icrt":"{}","Etp":"{}","SCC Susceptibility":"{}", "Description":"{}", "Others": "{}"}"...}",
+"Wear":"{"1":"{"States":"{}","Wear Coefficient":"{}","Wear mechanisms":"{}","Wear Resistance":"{}","Description":"{}", "Others":"{Parameter1: value/unit, Parameter2: value/unit...}"}","2":"{"States":"{}","Wear Coefficient":"{}","Wear mechanisms":"{}", "Wear Resistance":"{}","Description":"{}","Others":"{}"}"...}",
+"High Temperature Performance":"{"1":"{"States":"{}","Performance":"{}","Description":"{}","Others":"{Parameter1: value/unit, Parameter2: value/unit...}"}","2":"{"States":"{}","Performance":"{}","Description":"{}","Others":"{}"}"...}"
+"Dynamic load":"{"1":"{"States":"{}","Performance":"{}","Description":"{}","Others":"{Parameter1: value/unit, Parameter 2: value/unit...}"}","2":"{"States":"{}","Performance":"{}","Description":"{}","Others":"{}"}"...}"
+Note: 1. Output customized JSON directly, do not provide any explanation !!!
+2. If any kind of alloy performance not provided, not create customised JSON,  and if any specific info of the characteristic not provided, use N/A.
+3. Synonyms or simplified form of the parameters are the same, such as corrosion potential is Ecorr.
+4. High temperature performance is how properties of a material changed at elevated temperatures or high temperatures.
+5. Dynamic loading performance is how properties of a material changed at dynamic loads.
+Example: Input: Mechanical:{{hardness:155/Hv, yield strength:344/MPa, ultimate tensile strength: 372/MPa, ductility:12%, high-cycle fatigue life at 138 MPa: 93,792 cycles, high-cycle fatigue life at 92 MPa: 1,146,748 cycles}}, {fatigue crack growth behavior: Better crack growth resistance in the high Delta K regime (> 20 MPaâˆšm) than UA}, {creep life vertical: 98/h, creep life horizontal: 18.23/h, rupture elongation vertical: 8.11/%, rupture elongation horizontal: 8/%}.
+Output:"Fatigue":"{"1":"{"States":"{high-cycle}","Cycles/Nf":"{93,792/cycles}","Stress":"{138/MPa}","Others":"{fatigue crack growth behavior: Better crack growth resistance in the high Delta K regime (> 20 MPaâˆšm) than UA}"}",
+"2" :"{"States" :"{high-cycle}","Cycles/Nf":"{1,146,748/cycles}","Stress":"{92/MPa}","Others":"{fatigue crack growth behavior: Better crack growth resistance in the high Delta K regime (> 20 MPaâˆšm) than UA}"}"}", "Creep":"{"1":"{"States": "{vertical}","Life":"{98/h}","Others":"{rupture elongation: 8.11/%}"}", "2":"{"States":" {horizontal}","Life": "{18.23/h}", "Others":"{rupture elongation: 8/%}"}"}"
+<END>
+
+Prompt for Extraction of Structured Strengthening Mechanism:
+System instruction: Common alloy strengthening mechanism are Solid Solution Strengthen-
+ening SSS (σs−l), GrainBoundary Strengthening GBS or Hall-Petch (σH−P), Dislocation Strengthening DS or Work Hardening (σd, σW-H), Precipitation Strengthening PS (σp), Transformation Strengthening TS (σTS), Dispersion Strengthening ODS (σDS).
+Task: Summarize common alloy performance from the provided text into the customised JSON format: "Strengthening Mechanism": "{"States":"{}","Strengthening Phase":"{}", "Strengthening mechanism and proportion":"{.mechanism/hardening: proportion value (strength value)/unit, ... mechanism/hardening: proportion value (strength value) /unit ...}", "Strengthening Effect":"{}", "Description":"{}"}". Note:
+1.Output customized JSON directly, do not provide any explanation !!!
+2.If not provided related info, just skip and do not output.
+3.Synonyms or simplified form of the parameters are the same, such as σH−P, σGBS, Grain Boundary Hardening are Grain Boundary Strengthening.
+Example: Input 1: δ phase, MC carbides, M23C6 carbides, M6C carbides,
+Output 1:"Strengthening Mechanism":"{"Strengthening Phase":"{δ phase, MC carbides, M23C6 carbides, M6C carbides}"}",
+Input 2: ΔσH−P: 25.0, Δσd: 2.7, Δσp: 12.7, Δσs−l: 50.0, Δσexp: 10.6,
+Output 2: "Strengthening Mechanism":"{"Strengthening mechanism and proportion": "{ ΔσH-P: 25.0, Δσd: 2.7, Δσp:12.7, Δσs−l: 50.0, Δσexp:10.6}"}"
+Input 3: Solid Solution Strengthening, Deformation Twinning, Dynamic Hall-Petch Effect.
+Output 3: "Strengthening Mechanism":"{"Strengthening mechanism and proportion": "{Solid Solution Strengthening}","Strengthening Effect":"{Deformation Twinning, Dynamic Hall–Petch Effect}"}"
+<END>
